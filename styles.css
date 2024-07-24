@@ -45,11 +45,14 @@ nav ul li {
 nav ul li a {
     color: #fff;
     text-decoration: none;
-    transition: color 0.3s; /* color transition */
+    display: inline-block;
+    transition: color 0.3s, transform 0.5s; /* color and transform transitions */
+    transform-style: preserve-3d; /* 3D transform style */
 }
 
 nav ul li a:hover {
     color: #ffd700; /* Gold color on hover */
+    transform: rotateY(180deg); /* 3D rotation on hover */
 }
 
 main {
@@ -111,6 +114,11 @@ img:hover {
     border-color: #ffd700; /* Gold color on hover */
     transform: scale(1.05); /* Slight scale up on hover */
 }
+
+button:hover {
+  color: #008000
+}
+
 
 
 @keyframes fadeIn {

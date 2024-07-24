@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Daniel Rodriguez">
+    <meta name="keywords" content="budgeting, finance, personal finance, money management">
+    <meta name="description" content="Budget - Expense Input">
+    <title>Budget - Expense Input</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>Expense Input</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="RodriguezDanielHome.html">Home</a></li>
+            <li><a href="more-info.html">More Information</a></li>
+            <li><a href="budgetTable.html">Expense Input</a></li>
+            
+        </ul>
+    </nav>
+    <main>
+        <section>
+            <h2>Input Your Expenses</h2>
+            <p>Use the table below to input your expenses for better budgeting:</p>
+            <table id="expenseTable">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Cost</th>
+                        <th>Category</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" id="item1" name="item1"></td>
+                        <td><input type="number" id="cost1" name="cost1"></td>
+                        <td><input type="text" id="category1" name="category1"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" id="item2" name="item2"></td>
+                        <td><input type="number" id="cost2" name="cost2"></td>
+                        <td><input type="text" id="category2" name="category2"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button onclick="addRow()">Add Row</button>
+            <button onclick="calculateTotal()">Calculate Total</button>
+            <p id="total">Total: $0</p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Daniel Rodriguez. All rights reserved.</p>
+    </footer>
+</body>
+</html>
