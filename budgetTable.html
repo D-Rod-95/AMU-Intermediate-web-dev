@@ -8,106 +8,145 @@
     <title>Budget - Expense Input</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
     <script>
-	document.addEventListener('DOMContentLoaded', (event) => {
-    const dropZone = document.getElementById('dropZone');
-    
-    // Function to calculate total
-    function calculateTotal() {
-        let total = 0;
-        const costs = document.querySelectorAll('input[type="number"]');
-        costs.forEach(function(cost) {
-            total += parseFloat(cost.value) || 0;
+	  document.addEventListener('DOMContentLoaded', (event) => {
+            const dropZone = document.getElementById('dropZone');
+            
+            // Function to calculate total
+            function calculateTotal() {
+                let total = 0;
+                const costs = document.querySelectorAll('input[type="number"]');
+                costs.forEach(function(cost) {
+                    total += parseFloat(cost.value) || 0;
+                });
+                document.getElementById("total").innerText = "Total: $" + total.toFixed(2);
+            }
+
+            // Function to add a new row
+            function addRow(item = '', cost = '', category = '') {
+                const table = document.getElementById("expenseTable").getElementsByTagName('tbody')[0];
+                const newRow = table.insertRow();
+
+                const newItemCell = newRow.insertCell(0);
+                const newItemInput = document.createElement("input");
+                newItemInput.type = "text";
+                newItemInput.value = item;
+                newItemCell.appendChild(newItemInput);
+
+                const newCostCell = newRow.insertCell(1);
+                const newCostInput = document.createElement("input");
+                newCostInput.type = "number";
+                newCostInput.value = cost;
+                newCostCell.appendChild(newCostInput);
+                
+                const newCategoryCell = newRow.insertCell(2);
+                const newCategoryInput = document.createElement("input");
+                newCategoryInput.type = "text";
+                newCategoryInput.value = category;
+                newCategoryCell.appendChild(newCategoryInput);
+
+                newRow.setAttribute('draggable', true);
+                newRow.addEventListener('dragstart', dragStart);
+                newRow.addEventListener('dragover', dragOver);
+                newRow.addEventListener('drop', dropRow);
+            }
+
+            // Function to handle drag start
+            function dragStart(event) {
+                event.dataTransfer.setData('text/plain', event.target.rowIndex);
+                event.target.style.opacity = '0.5';
+            }
+
+            // Function to handle drag over
+            function dragOver(event) {
+                event.preventDefault();
+            }
+
+            // Function to handle row drop
+            function dropRow(event) {
+                event.preventDefault();
+                const table = document.getElementById("expenseTable").getElementsByTagName('tbody')[0];
+                const draggedRowIndex = event.dataTransfer.getData('text/plain');
+                const draggedRow = table.rows[draggedRowIndex - 1];
+                const targetRow = event.target.closest('tr');
+                if (targetRow) {
+                    table.insertBefore(draggedRow, targetRow.nextSibling);
+                }
+                draggedRow.style.opacity = '1';
+            }
+
+            // Function to handle drop zone drop
+            function dropInZone(event) {
+                event.preventDefault();
+                const draggedRowIndex = event.dataTransfer.getData('text/plain');
+                const table = document.getElementById("expenseTable").getElementsByTagName('tbody')[0];
+                const draggedRow = table.rows[draggedRowIndex - 1];
+                dropZone.appendChild(draggedRow);
+                draggedRow.style.opacity = '1';
+                dropZone.style.border = '2px dashed #aaa';
+            }
+
+            // Adding event listeners to the existing rows
+            const rows = document.querySelectorAll('#expenseTable tbody tr');
+            rows.forEach(row => {
+                row.setAttribute('draggable', true);
+                row.addEventListener('dragstart', dragStart);
+                row.addEventListener('dragover', dragOver);
+                row.addEventListener('drop', dropRow);
+            });
+
+            // Adding event listeners to the drop zone
+            dropZone.addEventListener('dragover', (event) => {
+                event.preventDefault();
+                dropZone.style.border = '2px dashed #00f';
+            });
+
+            dropZone.addEventListener('dragleave', (event) => {
+                dropZone.style.border = '2px dashed #aaa';
+            });
+
+            dropZone.addEventListener('drop', dropInZone);
+
+            // Function to save form data to local storage
+            function saveFormData() {
+                const costs = document.querySelectorAll('input[type="number"]');
+                const items = document.querySelectorAll('input[type="text"]');
+
+                let formData = {
+                    expenses: []
+                };
+
+                for (let i = 0; i < costs.length; i++) {
+                    formData.expenses.push({
+                        item: items[i * 2].value,
+                        cost: costs[i].value,
+                        category: items[i * 2 + 1].value
+                    });
+                }
+
+                localStorage.setItem('formData', JSON.stringify(formData));
+                alert('Data saved!');
+            }
+
+            // Function to load form data from local storage
+            function loadFormData() {
+                let formData = JSON.parse(localStorage.getItem('formData'));
+
+                if (formData) {
+                    const table = document.getElementById("expenseTable").getElementsByTagName('tbody')[0];
+                    formData.expenses.forEach(expense => {
+                        addRow(expense.item, expense.cost, expense.category);
+                    });
+                }
+            }
+
+            // Automatically load data on page load
+            loadFormData();
+
+            // Expose the functions to the global scope for button clicks
+            window.calculateTotal = calculateTotal;
+            window.addRow = addRow;
+            window.saveFormData = saveFormData;
         });
-        document.getElementById("total").innerText = "Total: $" + total.toFixed(2);
-    }
-
-    // Function to add a new row
-    function addRow() {
-        const table = document.getElementById("expenseTable").getElementsByTagName('tbody')[0];
-        const newRow = table.insertRow();
-
-        const newItemCell = newRow.insertCell(0);
-        const newItemInput = document.createElement("input");
-        newItemInput.type = "text";
-        newItemCell.appendChild(newItemInput);
-
-        const newCostCell = newRow.insertCell(1);
-        const newCostInput = document.createElement("input");
-        newCostInput.type = "number";
-        newCostCell.appendChild(newCostInput);
-        
-        const newCategoryCell = newRow.insertCell(2);
-        const newCategoryInput = document.createElement("input");
-        newCategoryInput.type = "text";
-        newCategoryCell.appendChild(newCategoryInput);
-
-        newRow.setAttribute('draggable', true);
-        newRow.addEventListener('dragstart', dragStart);
-        newRow.addEventListener('dragover', dragOver);
-        newRow.addEventListener('drop', dropRow);
-    }
-
-    // Function to handle drag start
-    // Did a lot of googling, w3, and YouTube to figure this drag and drop
-    function dragStart(event) {
-        event.dataTransfer.setData('text/plain', event.target.rowIndex);
-        event.target.style.opacity = '0.5';
-    }
-
-    // Function to handle drag over
-    function dragOver(event) {
-        event.preventDefault();
-    }
-
-    // Function to handle row drop
-    function dropRow(event) {
-        event.preventDefault();
-        const table = document.getElementById("expenseTable").getElementsByTagName('tbody')[0];
-        const draggedRowIndex = event.dataTransfer.getData('text/plain');
-        const draggedRow = table.rows[draggedRowIndex - 1];
-        const targetRow = event.target.closest('tr');
-        if (targetRow) {
-            table.insertBefore(draggedRow, targetRow.nextSibling);
-        }
-        draggedRow.style.opacity = '1';
-    }
-
-    // Function to handle drop zone drop
-    function dropInZone(event) {
-        event.preventDefault();
-        const draggedRowIndex = event.dataTransfer.getData('text/plain');
-        const table = document.getElementById("expenseTable").getElementsByTagName('tbody')[0];
-        const draggedRow = table.rows[draggedRowIndex - 1];
-        dropZone.appendChild(draggedRow);
-        draggedRow.style.opacity = '1';
-        dropZone.style.border = '2px dashed #aaa';
-    }
-
-    // Adding event listeners to the existing rows
-    const rows = document.querySelectorAll('#expenseTable tbody tr');
-    rows.forEach(row => {
-        row.setAttribute('draggable', true);
-        row.addEventListener('dragstart', dragStart);
-        row.addEventListener('dragover', dragOver);
-        row.addEventListener('drop', dropRow);
-    });
-
-    // Adding event listeners to the drop zone
-    dropZone.addEventListener('dragover', (event) => {
-        event.preventDefault();
-        dropZone.style.border = '2px dashed #00f';
-    });
-
-    dropZone.addEventListener('dragleave', (event) => {
-        dropZone.style.border = '2px dashed #aaa';
-    });
-
-    dropZone.addEventListener('drop', dropInZone);
-
-    // Expose the functions to the global scope for button clicks
-    window.calculateTotal = calculateTotal;
-    window.addRow = addRow;
-});
     </script>
 </head>
 <body>
@@ -116,10 +155,12 @@
     </header>
     <nav>
         <ul>
-            <li><a href="RodriguezDanielHome.html">Home</a></li>
+      <li><a href="RodriguezDanielHome.html">Home</a></li> <!-- Link back to the main page -->
             <li><a href="more-info.html">More Information</a></li>
-            <li><a href="budgetTable.html">Expense Input</a></li>
+	    <li><a href="budgetTable.html">Expense Input</a></li>
 	    <li><a href="contact.html">Contact</a></li>
+	    <li><a href="tresources.html">Resources</a></li>
+	    <li><a href="faq.html">FAQ</a></li>
             
         </ul>
     </nav>
@@ -150,6 +191,7 @@
             </table>
             <button onclick="addRow()">Add Row</button>
             <button onclick="calculateTotal()">Calculate Total</button>
+            <button onclick="saveFormData()">Save Data</button>
             <p id="total">Total: $0</p>
         </section>
 	  <section id="dropZone" class="dropzone">

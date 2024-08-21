@@ -119,7 +119,15 @@ button:hover {
   color: #008000
 }
 
+/* Error Styling */
+input.error, textarea.error {
+    border-color: red;
+}
 
+small {
+    display: none;
+    color: red;
+}
 
 @keyframes fadeIn {
     from {
@@ -128,6 +136,32 @@ button:hover {
     to {
         opacity: 1;
     }
+}
+
+@media screen and (max-width: 600px) {
+    body {
+        font-size: 16px;
+    };
+
+    nav {
+        display: flex;
+        flex-direction: column;
+    };
+
+    main {
+        padding: 10px;
+    };
+
+    table {
+        width: 100%;
+        display: block;
+        overflow-x: auto;
+    };
+
+    input[type="text"], input[type="number"] {
+        width: 100%;
+        box-sizing: border-box;
+    };
 }
 
 
